@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Intro } from "./components/intro";
 import { Shuffler } from "./components/shuffler";
 import { Experiment } from "./components/experiment";
@@ -10,20 +10,21 @@ const App = () => {
     const [pageState, setPageState] = useState(0);
     const [socialList, setSocialList] = useState([]);
     const [topicList, setTopicList] = useState([]);
+    const stream = useRef(null);
 
     const nextPage = () => setPageState((prev) => prev + 1);
     
-    console.log("userID:",subID)
+    console.log("App.js stream data:", stream)
     return (
         <div className="App">
             {(() => {
                 switch (pageState) {
                     case 0:
-                        return <Intro pageEvent={nextPage} subID={subID} setSubID={setSubID} />
+                        return <Intro pageEvent={nextPage} subID={subID} setSubID={setSubID} stream={stream} />
                     case 1:
-                        return <Shuffler pageEvent={nextPage} topicList={topicList} setTopicList={setTopicList} socialList={socialList} setSocialList={setSocialList} />
+                        return <Shuffler pageEvent={nextPage} setTopicList={setTopicList}  setSocialList={setSocialList} />
                     case 2: 
-                        return <Experiment pageEvent={nextPage} topicList={topicList} socialList={socialList} />
+                        return <Experiment pageEvent={nextPage} topicList={topicList} socialList={socialList} stream={stream} />
                     case 3:
                         return <Completion pageEvent={nextPage} />
                     default:
