@@ -1,0 +1,67 @@
+.App {
+  text-align: center;
+  font-family: sans-serif;
+  font-weight: 350;
+  font-size: 20px;
+  line-height: 1.6;;
+}
+
+h1 {
+  color:#15b08e;
+}
+
+.outer-div {
+  width: 75%;
+  height: 100%;
+  overflow:hidden;
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+}
+
+.inner-div {
+  position: relative;
+  height: 100%;
+}
+
+#enable-audio-div {
+  margin:auto;
+  width: 500px;
+  padding: 5px;
+  background-color: #37c7a335;
+  border-radius: 15px;
+}
+
+#enable-audio-button {
+  background-color: #ffffff;
+  color: #37c7a3;
+  padding: 10px 32px;
+  font-size: 25px;
+  border-radius: 15px;
+  border: 0px;
+  margin-bottom: 10px;
+}
+
+#start-study-button {
+  background-color: #6c37c7;
+  color: #ffffff;
+  padding: 10px 32px;
+  font-size: 25px;
+  border-radius: 15px;
+  border: 0px;
+  margin-bottom: 10px;
+}
+
+#next-button {
+  background-color: #15b08e;
+  color:white;
+  padding: 10px 32px;
+  margin-top:50px;
+  font-size: 25px;
+  border-radius: 15px;
+  border-color: #ffffff;
+}
+
+#progress-tracker {
+  padding-top: 40px;
+}
