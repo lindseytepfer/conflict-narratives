@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 
-export const Shuffler = ( {pageEvent, socialList, setSocialList, topicList, setTopicList} ) => {
+export const Shuffler = ( {pageEvent, setSocialList, setTopicList} ) => {
     const social =  ["family member","friend","romantic partner", "classmate",
     "employer or employee", "neighbor or roommate", "business or property owner", "stranger or acquaintance"];
     const topic = ["something financial", "parenting", "health", "a social gathering", "identity"];
