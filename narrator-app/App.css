@@ -24,24 +24,6 @@ h1 {
   height: 100%;
 }
 
-#enable-audio-div {
-  margin:auto;
-  width: 500px;
-  padding: 5px;
-  background-color: #37c7a335;
-  border-radius: 15px;
-}
-
-#enable-audio-button {
-  background-color: #ffffff;
-  color: #37c7a3;
-  padding: 10px 32px;
-  font-size: 25px;
-  border-radius: 15px;
-  border: 0px;
-  margin-bottom: 10px;
-}
-
 #start-study-button {
   background-color: #6c37c7;
   color: #ffffff;
@@ -52,8 +34,38 @@ h1 {
   margin-bottom: 10px;
 }
 
-#next-button {
+#enable-audio-button {
+  background-color: #37c7a335;
+  color: #37c7a3;
+  padding: 10px 32px;
+  font-size: 25px;
+  border-radius: 15px;
+  border: 0px;
+  margin-bottom: 10px;
+}
+
+#start-recording-button {
   background-color: #15b08e;
+  color: #ffffff;
+  padding: 10px 32px;
+  font-size: 25px;
+  border-radius: 15px;
+  border: 0px;
+  margin-bottom: 10px;
+}
+
+#stop-recording-button {
+  background-color: red;
+  color: #ffffff;
+  padding: 10px 32px;
+  font-size: 25px;
+  border-radius: 15px;
+  border: 0px;
+  margin-bottom: 10px;
+}
+
+#next-button {
+  background-color: #6c37c7;
   color:white;
   padding: 10px 32px;
   margin-top:50px;
