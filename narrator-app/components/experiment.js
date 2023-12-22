@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef} from "react";
 
 const mimeType = "audio/webm";
 
-export const Experiment = ( { pageEvent, socialList, topicList } ) => {
+export const Experiment = ( { pageEvent, topicPairs, setTopicPairs } ) => {
     const [index, setIndex] = useState(0)
     const [completed, setCompleted] = useState(0)
 
@@ -12,6 +12,18 @@ export const Experiment = ( { pageEvent, socialList, topicList } ) => {
     const [audio, setAudio] = useState(null);
     const [stream, setStream] = useState(null);
     const mediaRecorder = useRef(null);
+
+    useEffect(()=>{
+        if (completed === 4){
+            pageEvent();
+        }
+    },[completed])
+
+    const handleData = () => {
+        if (audio) {
+            setCompleted((prev)=>prev+1)
+        }
+      }
 
     const advIndex = () => {
         setIndex((prev) => prev +1)
@@ -23,6 +35,12 @@ export const Experiment = ( { pageEvent, socialList, topicList } ) => {
         } else {
             setIndex(0);
         }
+    }
+
+    const handleNext = () => {
+        handleData();
+        setAudio(null);
+        switchTopic();
     }
 
     const getMicPermission = async () => {
@@ -46,7 +64,6 @@ export const Experiment = ( { pageEvent, socialList, topicList } ) => {
         setRecordingStatus("recording");
 
         const media = new MediaRecorder(stream, { type: mimeType });
-        console.log("media variable:", media)
         mediaRecorder.current = media;
         mediaRecorder.current.start();
 
@@ -72,22 +89,12 @@ export const Experiment = ( { pageEvent, socialList, topicList } ) => {
         };
       };
 
-      const sendData = () => {
-        // holding this for sending audio files to fireBase
-      }
-    
-
-      const handleAudio = () => {
-          if (audio) {
-            // holding this for adding post-narrative 
-            // questions
-          }
-      }
+      console.log("topicPairs:",topicPairs[index][0],topicPairs[index][1])
 
     return(
         <div>
             <p>Tell us about a time you experienced an interpersonal conflict with:
-                a <strong>{socialList[index]}</strong> related to <strong>{topicList[index]}</strong>
+                a <strong>{topicPairs[index][0]}</strong> related to <strong>{topicPairs[index][1]}</strong>
             </p>
             
             {!permission ? (
@@ -117,7 +124,7 @@ export const Experiment = ( { pageEvent, socialList, topicList } ) => {
                     </div>
                     <div>
                     <p>Thank you for sharing this narrative. 
-                        Please answer a few additional questions about this scenarioin particular:</p>
+                        Please answer a few additional questions about this particular scenario:</p>
                     <p>How recently have you experienced this conflict?</p>
                     <p>Have you ever told someone about this conflict?</p>
                     <p>If you were sharing this story with someone, would you 
@@ -130,7 +137,7 @@ export const Experiment = ( { pageEvent, socialList, topicList } ) => {
                 }
 
             <div>
-                <button id="next-button" onClick={switchTopic}> next </button>
+                <button id="next-button" onClick={handleNext}> next </button>
             </div>
 
             <div id="progress-tracker">

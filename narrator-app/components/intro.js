@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import { v4 as uuid } from 'uuid';
 
-export const Intro = ( { pageEvent, subID, setSubID } ) => {
+export const Intro = ( { pageEvent, setSubID } ) => {
 
     const setID = () => {
         const x = uuid();
