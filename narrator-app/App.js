@@ -1,9 +1,10 @@
 import './App.css';
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Intro } from "./components/intro";
 import { Shuffler } from "./components/shuffler";
 import { Experiment } from "./components/experiment";
 import { Completion } from "./components/completion";
+
 
 const App = () => {
     const [subID, setSubID] = useState(0)
@@ -21,7 +22,7 @@ const App = () => {
                     case 1:
                         return <Shuffler pageEvent={nextPage} setTopicPairs={setTopicPairs} />
                     case 2: 
-                        return <Experiment pageEvent={nextPage} topicPairs={topicPairs} setTopicPairs={setTopicPairs} />
+                        return <Experiment subID={subID} pageEvent={nextPage} topicPairs={topicPairs} setTopicPairs={setTopicPairs} />
                     case 3:
                         return <Completion pageEvent={nextPage} />
                     default:

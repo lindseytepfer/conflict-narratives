@@ -24,6 +24,27 @@ h1 {
   height: 100%;
 }
 
+.radio-div {
+  margin:auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  width: 75%;
+  gap: 40px;
+  height: 100%;
+  border-radius: 15px;
+  border: 2px solid #15b08e;
+}
+
+.radio-group {
+  margin: auto;
+  padding-top: 15px;
+  color:#15b08e;
+}
+
+
 #start-study-button {
   background-color: #6c37c7;
   color: #ffffff;
@@ -72,8 +93,4 @@ h1 {
   font-size: 25px;
   border-radius: 15px;
   border-color: #ffffff;
-}
-
-#progress-tracker {
-  padding-top: 40px;
 }
