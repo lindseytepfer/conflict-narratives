@@ -1,11 +1,14 @@
 import React, {useState, useEffect, useRef} from "react";
+import { Questions } from "./questions.js";
+import { db, storage } from "./firebase.js"
+import { addDoc, collection } from 'firebase/firestore';
+import { ref, uploadBytes } from "firebase/storage";
 
-const mimeType = "audio/webm";
+const mimeType = "audio/wav";
 
-export const Experiment = ( { pageEvent, topicPairs, setTopicPairs } ) => {
+export const Experiment = ( { subID, pageEvent, topicPairs, setTopicPairs } ) => {
     const [index, setIndex] = useState(0)
     const [completed, setCompleted] = useState(0)
-
     const [permission, setPermission] = useState(false);
     const [recordingStatus, setRecordingStatus] = useState("inactive");
     const [audioClip, setAudioClip] = useState([]);
@@ -13,34 +16,54 @@ export const Experiment = ( { pageEvent, topicPairs, setTopicPairs } ) => {
     const [stream, setStream] = useState(null);
     const mediaRecorder = useRef(null);
 
-    useEffect(()=>{
-        if (completed === 4){
-            pageEvent();
-        }
-    },[completed])
+    const [blob, setBlob] = useState(null);
 
-    const handleData = () => {
-        if (audio) {
-            setCompleted((prev)=>prev+1)
-        }
-      }
+    // narrative follow-up question states:
+    const [q1, setQ1] = useState(0);
+    const [q2, setQ2] = useState(0);
+    const [q3, setQ3] = useState(0);
+    const [q4, setQ4] = useState(0);
+    const [q5, setQ5] = useState(0);
 
-    const advIndex = () => {
-        setIndex((prev) => prev +1)
+    const dataCollectionRef = collection(db, "responses")
+
+    // upload audio to firestore storage
+    const sendAudio = async () => {
+
+        const narrativeFolderRef = ref(storage, `narratives/${subID}_audio`)
+
+        try { 
+            await uploadBytes(narrativeFolderRef, blob, {contentType:mimeType})
+            console.log("Audio uploaded successfully.")
+
+        } catch(err) {
+            console.error(err.code, err.message)
+        }
     }
 
-    const switchTopic = () => {
-        if (index < 4) {
-            advIndex();
-        } else {
-            setIndex(0);
+    const sendData = async () => {
+        try {
+            await addDoc(dataCollectionRef, {
+                userID: subID,
+                relationship:topicPairs[index][0],
+                topic:topicPairs[index][1],
+                q1: q1,
+                q2: q2,
+                q3: q3,
+                q4: q4,
+                q5: q5,
+        });
+        } catch (err) {
+            console.error(err)
         }
     }
 
-    const handleNext = () => {
-        handleData();
-        setAudio(null);
-        switchTopic();
+    const clearRadios = () => {
+        setQ1(0);
+        setQ2(0);
+        setQ3(0);
+        setQ4(0);
+        setQ5(0);
     }
 
     const getMicPermission = async () => {
@@ -64,6 +87,7 @@ export const Experiment = ( { pageEvent, topicPairs, setTopicPairs } ) => {
         setRecordingStatus("recording");
 
         const media = new MediaRecorder(stream, { type: mimeType });
+
         mediaRecorder.current = media;
         mediaRecorder.current.start();
 
@@ -74,28 +98,69 @@ export const Experiment = ( { pageEvent, topicPairs, setTopicPairs } ) => {
            localAudioClips.push(event.data);
         };
         setAudioClip(localAudioClips);
-      };
+    };
 
-      const stopRecording = () => {
+    // end audio recording + send file to firestore
+    const stopRecording = () => {
         setRecordingStatus("inactive");
 
         mediaRecorder.current.stop();
         mediaRecorder.current.onstop = () => {
 
-           const audioBlob = new Blob(audioClip, { type: mimeType });
-           const audioUrl = URL.createObjectURL(audioBlob);
-           setAudio(audioUrl);
-           setAudioClip([]);
-        };
-      };
+            const audioBlob = new Blob(audioClip, { type: mimeType });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            setAudio(audioUrl);
+            setAudioClip([]);
 
-      console.log("topicPairs:",topicPairs[index][0],topicPairs[index][1])
+            setBlob(audioBlob)
+        };
+
+    };
+
+    // Progression across the experiment
+
+    useEffect(()=>{
+        if (completed === 4){
+            pageEvent();
+        }
+    },[completed])
+
+    const advIndex = () => {
+        setIndex((prev) => prev +1)
+    }
+
+    const switchTopic = () => {
+        if (index < 4) { //need to set this to a larger index based on full topic set
+            advIndex();
+        } else {
+            setIndex(0);
+        }
+    }
+
+    const handleNext = () => {
+        if (audio) {
+            setCompleted((prev)=>prev+1)
+            sendAudio();
+            sendData();
+        }
+        clearRadios();
+        setAudio(null);
+        setBlob(null);
+        switchTopic();
+    }
+
+    const dropTopic = () =>{
+        return
+    }
+
+    console.log("topic pairs:", topicPairs)
 
     return(
         <div>
             <p>Tell us about a time you experienced an interpersonal conflict with:
                 a <strong>{topicPairs[index][0]}</strong> related to <strong>{topicPairs[index][1]}</strong>
             </p>
+            <p><em><font color="#aaacad">to skip this category, please press the 'next' button below</font></em> </p>
             
             {!permission ? (
                         <button id="enable-audio-button" onClick={getMicPermission} >Enable Audio Permissions</button>
@@ -119,19 +184,12 @@ export const Experiment = ( { pageEvent, topicPairs, setTopicPairs } ) => {
 
                 { audio ? (
                     <>
-                    <div>
-                    <audio src={audio} controls></audio>
-                    </div>
-                    <div>
-                    <p>Thank you for sharing this narrative. 
-                        Please answer a few additional questions about this particular scenario:</p>
-                    <p>How recently have you experienced this conflict?</p>
-                    <p>Have you ever told someone about this conflict?</p>
-                    <p>If you were sharing this story with someone, would you 
-                        want the listener to give you their advice on how to resolve it?</p>
-                    <p>If you were sharing this story with someone, would you 
-                    want the listener to validate your emotions?</p>
-                    </div>
+                        <div>
+                        <audio src={audio} controls></audio>
+                        </div>
+
+                        <Questions q1={q1} q2={q2} q3={q3} q4={q4} q5={q5} setQ1={setQ1} setQ2={setQ2} setQ3={setQ3} setQ4={setQ4} setQ5={setQ5} />
+
                     </>
                     ): null
                 }

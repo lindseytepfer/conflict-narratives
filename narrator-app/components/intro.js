@@ -18,15 +18,18 @@ export const Intro = ( { pageEvent, setSubID } ) => {
                 <div className='inner-div'>
                     <h1>Conflict Narratives Study</h1>
                     <p> 
-                        In this experiment, you will record yourself talking about various categories
-                        of interpersonal conflict experiences that you have had. You will be able to select
-                        4 topics to narrate out of 8 potential topics presented to you. 
+                        In this experiment, you will record yourself talking about interpersonal
+                         conflicts that you have experienced. 
+                    </p>
+                    <p> 
+                        We will present several topics to choose from; out of these categories, you
+                        only need to select <strong>four</strong> stories to share to complete the study.  
                     </p>
                     <p>  
-                        After you finish recording, you will be asked several questions about that 
-                        interpersonal conflict scenario, such as how recently you've experienced it, if you
-                        have told this story before, and, hypothetically, if you were to tell someone this
-                        story, how you would want that person to respond.
+                        After you finish each recording, you will be asked five follow-up questions about that 
+                        specific scenario. For example, we'll ask how recent this conflict is, if you
+                        have told anyone about the situation before, and, hypothetically, how you would want a 
+                        listener to respond if you were to share your experience.
                     </p> 
                         
                     <div>
