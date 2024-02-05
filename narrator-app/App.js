@@ -1,8 +1,10 @@
 import './App.css';
 import { useState, useRef, useEffect } from "react";
+import { Consent } from './components/consent';
 import { Intro } from "./components/intro";
 import { Experiment } from "./components/experiment";
-import { Completion } from "./components/completion";
+import { Demographics } from "./components/demographics";
+import { Debrief } from "./components/debrief";
 
 
 const App = () => {
@@ -16,11 +18,15 @@ const App = () => {
             {(() => {
                 switch (pageState) {
                     case 0:
+                        return <Consent pageEvent={nextPage} />
+                    case 1: 
                         return <Intro pageEvent={nextPage} setSubID={setSubID} />
-                    case 1:
-                        return <Experiment subID={subID} pageEvent={nextPage} />
                     case 2:
-                        return <Completion pageEvent={nextPage} />
+                        return <Experiment subID={subID} pageEvent={nextPage} />
+                    case 3:
+                        return <Demographics pageEvent={nextPage} />
+                    case 4:
+                        return <Debrief pageEvent={nextPage} />
                     default:
                         return null;
                 }
