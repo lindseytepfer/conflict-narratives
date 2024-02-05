@@ -1,16 +1,23 @@
 import React, {useState, useEffect, useRef} from "react";
 import { Questions } from "./questions.js";
-import { db, storage } from "./firebase.js"
+import { CountdownTimer } from "./countdownTimer.js";
+import { db, storage } from "../config/firebase.js"
 import { addDoc, collection } from 'firebase/firestore';
 import { ref, uploadBytes } from "firebase/storage";
 var sample = require( '@stdlib/random-sample' );
 
-const mimeType = "audio/wav";
+const mimeType = "audio/webm";
 
 export const Experiment = ( { subID, pageEvent } ) => {
     // carousel states
     const [topicPairs, setTopicPairs] = useState([]);
-    const [completed, setCompleted] = useState(0)
+    const [completed, setCompleted] = useState(0);
+    const [hideButton, setHideButton] = useState(false);
+    const [buttonText, setButtonText] = useState("skip");
+    
+    const [index, setIndex] = useState();
+    const [answered, setAnswered] = useState([]);
+    const [skipped, setSkipped] = useState([]);
 
     // audio states
     const [permission, setPermission] = useState(false);
@@ -34,7 +41,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
         ["something financial","family member"],
         ["something financial","friend"],
         ["something financial","romantic partner"],
-        ["something financial","classmate/colleague"],
+        ["something financial","classmate or colleague"],
         ["something financial","employer or employee"],
         ["something financial","neighbor or roommate"],
         ["something financial","business or property owner"],
@@ -42,7 +49,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
         ["a social gathering","family member"],
         ["a social gathering","friend"],
         ["a social gathering","romantic partner"],
-        ["a social gathering","classmate/colleague"],
+        ["a social gathering","classmate or colleague"],
         ["a social gathering","employer or employee"],
         ["a social gathering","neighbor or roommate"],
         ["a social gathering","business or property owner"],
@@ -50,7 +57,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
         ["health","family member"],
         ["health","friend"],
         ["health","romantic partner"],
-        ["health","classmate/colleague"],
+        ["health","classmate or colleague"],
         ["health","employer or employee"],
         ["health","neighbor or roommate"],
         ["health","business or property owner"],
@@ -58,7 +65,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
         ["identity","family member"],
         ["identity","friend"],
         ["identity","romantic partner"],
-        ["identity","classmate/colleague"],
+        ["identity","classmate or colleague"],
         ["identity","employer or employee"],
         ["identity","neighbor or roommate"],
         ["identity","business or property owner"],
@@ -66,7 +73,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
         ["parenting","family member"],
         ["parenting","friend"],
         ["parenting","romantic partner"],
-        ["parenting","classmate/colleague"],
+        ["parenting","classmate or colleague"],
         ["parenting","employer or employee"],
         ["parenting","neighbor or roommate"],
         ["parenting","business or property owner"],
@@ -87,21 +94,29 @@ export const Experiment = ( { subID, pageEvent } ) => {
             'size': 1,
             'replace': true
         });
-        
+
         setTopicPairs(categories[out[0]])
+        setIndex(out[0])
     }
+
+    ///if the index is in the answered list, skip it and sample the topic again.
+    useEffect(()=>{
+        if (answered.includes(index)) {
+            sampleTopic();
+        }
+        setSkipped(skipped => [...skipped,categories[index]]);
+    }, [index])
 
     useEffect(()=>{
         sampleTopic();
     }, [])
-
 
     const dataCollectionRef = collection(db, "responses")
 
     // upload audio to firestore storage
     const sendAudio = async () => {
 
-        const narrativeFolderRef = ref(storage, `narratives/${subID}_audio`)
+        const narrativeFolderRef = ref(storage, `narratives/SUB_${subID}/${subID}_${topicPairs[0]}_${topicPairs[1]}.webm`)
 
         try { 
             await uploadBytes(narrativeFolderRef, blob, {contentType:mimeType})
@@ -123,6 +138,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
                 q3: q3,
                 q4: q4,
                 q5: q5,
+                skipped: JSON.stringify(skipped),
         });
         } catch (err) {
             console.error(err)
@@ -135,6 +151,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
         setQ3(0);
         setQ4(0);
         setQ5(0);
+        setHideButton(false);
     }
 
     const getMicPermission = async () => {
@@ -184,10 +201,18 @@ export const Experiment = ( { subID, pageEvent } ) => {
             setAudioClip([]);
 
             setBlob(audioBlob)
+            setButtonText('continue')
+            setHideButton(true)
         };
     };
 
     // Progression across the experiment
+
+    useEffect(()=>{
+        if (q1 && q2 && q3 && q4 && q5 !== 0){
+            setHideButton(false);
+        }
+    },[q1,q2,q3,q4,q5])
 
     useEffect(()=>{
         if (completed === 4){
@@ -200,6 +225,10 @@ export const Experiment = ( { subID, pageEvent } ) => {
             setCompleted((prev)=>prev+1)
             sendAudio();
             sendData();
+            setButtonText('skip')
+            setHideButton(false)
+
+            setAnswered(answered => [...answered,index]);
         }
 
         clearRadios();
@@ -208,54 +237,79 @@ export const Experiment = ( { subID, pageEvent } ) => {
         sampleTopic();
     }
 
-    console.log("topic pairs:", topicPairs)
+    const handleRerecord = () => {
+        setAudio(null)
+        startRecording()
+    }
+
+    // TROUBLESHOOTING
+
+
+    console.log("index", index, "answered:", answered, "skipped:", skipped)
 
     return(
-        <div>
-            <p>Tell us about a time you experienced an interpersonal conflict with:
-                a <strong>{topicPairs[1]}</strong> related to <strong>{topicPairs[0]}</strong>
-            </p>
-            <p><em><font color="#aaacad">to skip this category, please press the 'next' button below</font></em> </p>
-            
-            {!permission ? (
-                        <button id="enable-audio-button" onClick={getMicPermission} >Enable Audio Permissions</button>
-                ): null
-                }
+        <div className="container">
+            {!permission && 
+            <>
+                <p>Before we can begin, please select the button below to provide audio permissions:</p>
+                <button id="enable-audio-button" onClick={getMicPermission} >Enable Audio Permissions</button>
+            </>
+            }
 
-                {recordingStatus === "inactive" && permission && !audio ?(
-                    <div>
+            { permission &&
+            <>
+                <p>Tell us about a time you experienced an interpersonal conflict with:<br/><br/>
+                a <strong>{topicPairs[1]}</strong> related to <strong>{topicPairs[0]}</strong> <br/><br/>
+                </p>
+
+                {recordingStatus === "inactive" && permission && !audio &&
+                <>
                     <button id='start-recording-button' onClick={startRecording}>Start recording</button>
-                    </div>
-                    ): null
+                </>
+                }
+               
+               {recordingStatus === "recording" &&
+                <div>
+                    <button id='stop-recording-button' onClick={stopRecording}>End recording</button>
+                    <CountdownTimer forceStop={stopRecording} />
+                </div>
                 }
 
-                {recordingStatus === "recording" ? ( 
-                    <div>
-                    <button id='stop-recording-button' onClick={stopRecording}>Stop recording</button>
-                    <p>recording in process...</p>
-                    </div>
-                    ): null
-                }
+                { audio && 
+                <>
+                    <p>Here's your audio; you can listen and decide whether or not you'd like to re-record:</p>
+                    <audio src={audio} controls></audio>
+                    <div><button className="advance-button" onClick={handleRerecord}>re-record</button></div>
 
-                { audio ? (
                     <>
-                        <div>
-                        <audio src={audio} controls></audio>
-                        </div>
-
-                        <Questions q1={q1} q2={q2} q3={q3} q4={q4} q5={q5} setQ1={setQ1} setQ2={setQ2} setQ3={setQ3} setQ4={setQ4} setQ5={setQ5} />
-
+                    <Questions q1={q1} q2={q2} q3={q3} q4={q4} q5={q5} setQ1={setQ1} setQ2={setQ2} setQ3={setQ3} setQ4={setQ4} setQ5={setQ5} />
                     </>
-                    ): null
+                </>
                 }
 
-            <div>
-                <button id="next-button" onClick={handleNext}> next </button>
-            </div>
+                {hideButton &&
+                    <>
+                        <div><span className="subtext">Please answer all the questions above to proceed.</span></div>
+                    </>
+                }
 
-            <div id="progress-tracker">
-                <em>Recordings completed: {completed}/4 </em>
-            </div>
+                {recordingStatus !== "recording" &&
+                <>
+                    <div>
+                        <button className="advance-button" onClick={handleNext} disabled={hideButton} style={{background: hideButton ? 'grey' : ''}}> {buttonText} </button>
+                    </div>
+                </>                    
+                }
+
+
+                <div id="progress-tracker">
+                    <span className="subtext">Recordings completed: {completed}/4 </span>
+                </div>
+            
+            
+            </>
+            }
+
             
         </div>
     );
