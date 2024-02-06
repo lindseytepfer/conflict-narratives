@@ -3,10 +3,10 @@ import { v4 as uuid } from 'uuid';
 
 export const Intro = ( { pageEvent, setSubID } ) => {
 
-    const [clicked, setClicked] = useState(false)
+    const [part, setPart] = useState(1)
 
     const handleClick = () => {
-        setClicked(true);
+        setPart((prev) => prev + 1);
     }
 
     const setID = () => {
@@ -21,7 +21,7 @@ export const Intro = ( { pageEvent, setSubID } ) => {
 
     return (
         <>
-            {!clicked && 
+            {part===1 && 
             <>
                 <div className="container">
                     <h1>Conflict Narratives Study</h1>
@@ -37,7 +37,7 @@ export const Intro = ( { pageEvent, setSubID } ) => {
                     For example, one of the questions we ask is whether you have experienced an
                     interpersonal conflict with a <strong>romantic partner related to health</strong>.
                     If you choose to share a story that fits with this category, you will press a button
-                    to <strong>start</strong> a recording and press <strong>stop</strong> when you are
+                    to <strong>start</strong> a recording and press <strong>end</strong> when you are
                     done. 
                     <br/><br/>
 
@@ -47,35 +47,62 @@ export const Intro = ( { pageEvent, setSubID } ) => {
                     </p> 
                         
                     <div>
-                        <button className="advance-button" onClick={handleClick}>makes sense!</button>
+                        <button className="advance-button" onClick={handleClick}>continue</button>
                     </div>
                 </div>            
             </>
             }
 
-            {clicked && 
+            {part === 2 && 
             <>
                 <div className="container">
                     <h1>Conflict Narratives Study</h1>
                     <h2>Instructions</h2>
                     <p> 
-                        <span id="warning-text">Critically, it is extremely important that you do not share any sensitive
+
+                        There are <strong>three</strong> key things to know about these recordings:
+                        <br/><br/>
+
+                        <strong>First,</strong><span id="warning-text"> it is extremely important that you do not share any sensitive
                         information, such as personally identifying information or stories involving violence.</span> 
                         <br/><br/>
 
-                        These stories will be converted to text and presented in a follow-up study for other people to 
+                        <strong>Second,</strong> these stories will be converted to text and presented in a follow-up study for other people to 
                         read, so it is essential that you talk about these conflicts in general terms. 
                         <br/><br/>
 
-                        After you finish each recording, you will be asked <strong>five</strong> follow-up questions about 
-                        that specific scenario. For example, we'll ask how recent this conflict is, if you
-                        have told anyone about the situation before, and, hypothetically, how you would want a 
-                        listener to respond if you were to share your experience. 
+                        <strong>Third</strong>, the recordings should be at least a minute long; each recording will be manually
+                        inspected to ensure that the recordings *actually* contain stories about interpersonal conflicts. Participants who
+                        submit empty or inappropriate audio recordings will be rejected.
+                        <br/><br/>
+                    </p> 
+                        
+                    <div>
+                        <button className="advance-button" onClick={handleClick}>I understand</button>
+                    </div>
+                </div>
+            </>
+            }
+            {part === 3 && 
+            <>
+                <div className="container">
+                    <h1>Conflict Narratives Study</h1>
+                    <h2>Instructions</h2>
+                    <p> 
+                        After you finish each recording, you will be asked <strong>five</strong> follow-up questions.
+                        For example, we'll ask how recent this conflict is, if you have told anyone about the situation 
+                        before, and, hypothetically, how you would want a listener to respond if you were to share your experience. 
                         <br/><br/>
 
-                        And that's it! Once you have shared four interpersonal conflict stories, and answered
-                        their corresponding follow-up questions, you will be redirected to a page to access the
-                        completion/payment code. 
+                        Once you have shared four interpersonal conflict stories, you will be asked to fill out a brief
+                        demographic survey. Upon completion, you will see a debrief page that will redirect you to
+                        access your Cloud Research completion/payment code. 
+                        <br/><br/>
+
+                        <strong>
+                            PLEASE DO NOT REFRESH YOUR BROWSER OR 
+                            CLICK THE BACK BUTTON DURING THE EXPERIMENT.
+                        </strong>
                     </p> 
                         
                     <div>
