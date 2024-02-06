@@ -16,7 +16,9 @@ export const Consent = ( { pageEvent } ) => {
             </p>
             <p>
                 <strong>Study Summary: </strong><br/>
-                This study aims to understand how people narrate the interpersonal conflicts in their lives, and what type of feedback, or responses, they want to receive from listeners. Importantly, the narratives collected from this study will be later transcribed, deidentified/anonymized and re-presented to future participants as text. This will allow us to later study how individuals understand and provide feedback on different types of interpersonal conflicts. The risk of participating in this study is minimal, no greater than what you would experience in the course of everyday internet use for an equivalent period of time. Your participation in this study is completely voluntary. You many choose not to participate. You may withdraw at any time during the study without penalty by simply closing this tab or window of your web browser.
+                This study aims to understand how people narrate the interpersonal conflicts in their lives, and what type of feedback, or responses, they want to receive from listeners. Importantly, the narratives collected from this study will be later transcribed, deidentified/anonymized and re-presented to future participants as text. This will allow us to later study how individuals understand and provide feedback on different types of interpersonal conflicts. 
+                <br/><br/>
+                The risk of participating in this study is minimal, no greater than what you would experience in the course of everyday internet use for an equivalent period of time. Your participation in this study is completely voluntary. You many choose not to participate. You may withdraw at any time during the study without penalty by simply closing this tab or window of your web browser.
             </p>
             <p>
                 <strong>What is the purpose of this study?</strong><br/>

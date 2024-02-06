@@ -35,7 +35,7 @@ export const Intro = ( { pageEvent, setSubID } ) => {
                     <br/><br/>
 
                     For example, one of the questions we ask is whether you have experienced an
-                    interpersonal conflict with a <strong>romantic partner related to health</strong>.
+                    interpersonal conflict with a <strong>romantic partner</strong> related to <strong>health</strong>.
                     If you choose to share a story that fits with this category, you will press a button
                     to <strong>start</strong> a recording and press <strong>end</strong> when you are
                     done. 
@@ -43,7 +43,6 @@ export const Intro = ( { pageEvent, setSubID } ) => {
 
                     If you don't want to answer this particular question, you can choose to skip it by 
                     pressing a <strong>'skip'</strong> button to generate a new topic category. 
-                    <br/><br/>
                     </p> 
                         
                     <div>
@@ -71,10 +70,9 @@ export const Intro = ( { pageEvent, setSubID } ) => {
                         read, so it is essential that you talk about these conflicts in general terms. 
                         <br/><br/>
 
-                        <strong>Third</strong>, the recordings should be at least a minute long; each recording will be manually
-                        inspected to ensure that the recordings *actually* contain stories about interpersonal conflicts. Participants who
-                        submit empty or inappropriate audio recordings will be rejected.
-                        <br/><br/>
+                        <strong>Third</strong>, the recordings should be at least a minute long but not longer than five minutes; each recording 
+                        will be manually inspected to ensure that the recordings contain stories about interpersonal conflicts. 
+                        Participants who submit empty or inappropriate audio recordings will be rejected.
                     </p> 
                         
                     <div>

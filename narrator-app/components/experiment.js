@@ -18,6 +18,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
     const [index, setIndex] = useState();
     const [answered, setAnswered] = useState([]);
     const [skipped, setSkipped] = useState([]);
+    const [hideStop, setHideStop] = useState(true);
 
     // audio states
     const [permission, setPermission] = useState(false);
@@ -83,7 +84,6 @@ export const Experiment = ( { subID, pageEvent } ) => {
     const topicIndices = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
     21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39];
 
-
     const sampleTopic = () => {
         const out = sample(topicIndices, {
             'probs': [0.025244,0.021687,0.027809,0.035271,0.025011,0.023087,0.034805,0.021279,
@@ -111,6 +111,8 @@ export const Experiment = ( { subID, pageEvent } ) => {
         sampleTopic();
     }, [])
 
+    // DATA HANDLING //
+
     const dataCollectionRef = collection(db, "responses")
 
     // upload audio to firestore storage
@@ -126,7 +128,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
             console.error(err.code, err.message)
         }
     }
-
+    // Upload response data to firebase
     const sendData = async () => {
         try {
             await addDoc(dataCollectionRef, {
@@ -154,6 +156,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
         setHideButton(false);
     }
 
+    // RECORDING FUNCTIONALITY //
     const getMicPermission = async () => {
         if ("MediaRecorder" in window) {
             try {
@@ -206,6 +209,22 @@ export const Experiment = ( { subID, pageEvent } ) => {
         };
     };
 
+    const toggleStop = () => {
+        if (recordingStatus === "recording") {
+            setHideStop(false)
+        }
+    }
+
+    useEffect(()=>{
+          const timer = setTimeout(()=>{
+              toggleStop();
+          }, 60000)
+    
+          return () => {
+            clearTimeout(timer)
+          }
+      }, [recordingStatus])
+
     // Progression across the experiment
 
     useEffect(()=>{
@@ -227,6 +246,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
             sendData();
             setButtonText('skip')
             setHideButton(false)
+            setHideStop(true)
 
             setAnswered(answered => [...answered,index]);
         }
@@ -245,7 +265,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
     // TROUBLESHOOTING
 
 
-    console.log("index", index, "answered:", answered, "skipped:", skipped)
+    console.log("recording status:",recordingStatus, "hideStop?", hideStop)
 
     return(
         <div className="container">
@@ -270,16 +290,16 @@ export const Experiment = ( { subID, pageEvent } ) => {
                
                {recordingStatus === "recording" &&
                 <div>
-                    <button id='stop-recording-button' onClick={stopRecording}>End recording</button>
+                    <button id='stop-recording-button' onClick={stopRecording} disabled={hideStop} style={{background: hideStop ? 'grey' : ''}}>End recording</button>
                     <CountdownTimer forceStop={stopRecording} />
                 </div>
                 }
 
                 { audio && 
                 <>
-                    <p>Here's your audio; you can listen and decide whether or not you'd like to re-record:</p>
+                    <p>Your audio recording: </p> 
                     <audio src={audio} controls></audio>
-                    <div><button className="advance-button" onClick={handleRerecord}>re-record</button></div>
+                    <div><button className="re-record-button" onClick={handleRerecord}>re-record? (optional)</button></div>
 
                     <>
                     <Questions q1={q1} q2={q2} q3={q3} q4={q4} q5={q5} setQ1={setQ1} setQ2={setQ2} setQ3={setQ3} setQ4={setQ4} setQ5={setQ5} />
@@ -287,7 +307,7 @@ export const Experiment = ( { subID, pageEvent } ) => {
                 </>
                 }
 
-                {hideButton &&
+                {hideButton && recordingStatus !== "recording" &&
                     <>
                         <div><span className="subtext">Please answer all the questions above to proceed.</span></div>
                     </>
